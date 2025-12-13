@@ -22,30 +22,25 @@
         #content-container {
             width: 1536px;
             height: 1024px;
-            
-            /* ============== 배경 이미지 설정 (bok.png 적용) ============== */
             background-image: url('bok.png'); 
             background-size: 1536px 1024px; 
             background-repeat: no-repeat;
             background-position: center;
-            /* ================================================= */
-
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             position: relative;
-            
             color: #FFD700; 
             text-shadow: 0 0 10px rgba(0, 0, 0, 1), 0 0 20px rgba(0, 0, 0, 0.7);
         }
         
-        /* 도시 선택기 컨테이너 스타일 */
+        /* 도시 선택기 컨테이너 스타일 (중앙 위치) */
         #city-selector-container {
             position: absolute;
-            top: 50%; /* 화면 중간 위치 */
+            top: 50%; 
             left: 50%;
-            transform: translate(-50%, -50%); /* 정확히 중앙 정렬 */
+            transform: translate(-50%, -50%);
             background-color: rgba(0, 0, 0, 0.6); 
             padding: 25px 40px;
             border-radius: 12px;
@@ -84,7 +79,7 @@
             right: 20px;
         }
 
-        /* 사용자 문구 스타일 */
+        /* ✨ 사용자 문구 스타일 (Flexbox 적용으로 수직 정렬 강제) */
         #user-message {
             font-size: 32px; 
             font-weight: 600;
@@ -94,7 +89,13 @@
             position: absolute;
             top: 120px;
             right: 0px; 
-            width: 500px; 
+            width: 500px;
+            
+            /* 핵심 수정 부분 */
+            display: flex;
+            justify-content: flex-end; 
+            align-items: center; 
+            flex-wrap: wrap; 
         }
         
         /* 다운로드 버튼 스타일 */
@@ -129,7 +130,8 @@
     <div id="content-container">
         <div id="current-time"></div>
         <div id="user-message">
-            (가까운 곳에서, 끌림이 피는 중 근처의 누군가를 찾고 있어요..)
+            <span id="message-prefix">(가까운 곳에서, 끌림이 피는 중 </span>
+            <span id="city-placeholder">근처의 누군가를 찾고 있어요..)</span>
         </div>
 
         <div id="city-selector-container">
@@ -143,7 +145,7 @@
                     <option value="강동구">강동구</option>
                     <option value="종로구">종로구</option>
                     <option value="마포구">마포구</option>
-                    </optgroup>
+                </optgroup>
 
                 <optgroup label="광역시 및 특별자치시">
                     <option value="부산광역시">부산광역시</option>
@@ -219,16 +221,35 @@
         setInterval(updateTime, 1000);
         updateTime(); 
         
-        // 선택된 도시에 따라 문구를 업데이트하는 함수
+        // ✨ 선택된 도시에 따라 문구를 업데이트하는 함수 (Flexbox 구조에 맞게 수정)
         function updateMessage(city) {
             const messageElement = document.getElementById('user-message');
+            
+            // 기존의 innerHTML 전체 교체 방식 대신, 요소를 조작하여 Flexbox 정렬이 유지되도록 합니다.
+            // (가까운 곳에서, 끌림이 피는 중 </span> <-- prefix
+            // <span class="city-name">도시명</span>
+            // <span class="city-suffix">근처의 누군가를 찾고 있어요..)</span>
+            
+            let prefix = "(가까운 곳에서, 끌림이 피는 중 ";
+            let suffix = " 근처의 누군가를 찾고 있어요..)";
+            
             if (city && city !== "none") {
-                // 문구에 선택된 도시 이름을 삽입하고 수직 정렬을 middle로 지정하여 높낮이 문제 해결
-                messageElement.innerHTML = `(가까운 곳에서, 끌림이 피는 중 <span style="font-weight: 900; color: #fff; vertical-align: middle;">${city}</span> 근처의 누군가를 찾고 있어요..)`;
+                // 도시가 선택된 경우: 도시 이름이 포함된 새로운 HTML 구성
+                messageElement.innerHTML = `
+                    <span>${prefix}</span>
+                    <span style="font-weight: 900; color: #fff;">${city}</span>
+                    <span>${suffix}</span>
+                `;
             } else {
-                messageElement.textContent = "(가까운 곳에서, 끌림이 피는 중 근처의 누군가를 찾고 있어요..)";
+                // 도시가 선택되지 않은 경우: 플레이스홀더 텍스트만 표시 (도시가 선택되지 않은 상태의 초기 문구)
+                messageElement.innerHTML = `<span>${prefix}근처의 누군가를 찾고 있어요..)</span>`;
             }
         }
+        
+        // 페이지 로드 시 초기 문구 설정 (Flexbox 구조에 맞춤)
+        document.addEventListener('DOMContentLoaded', () => {
+             document.getElementById('user-message').innerHTML = `<span>(가까운 곳에서, 끌림이 피는 중 근처의 누군가를 찾고 있어요..)</span>`;
+        });
 
         // 그림 다운로드 기능
         document.getElementById('download-button').addEventListener('click', function() {
@@ -257,10 +278,4 @@
                 link.download = '시간_지역_화면.png';
                 document.body.appendChild(link);
                 link.click();
-                document.body.removeChild(link);
-            });
-        });
-    </script>
-
-</body>
-</html>
+                document
