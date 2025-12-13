@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>시간 + 지역 화면</title>
+<title>전국 지역 선택 화면</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
 <style>
@@ -16,17 +16,17 @@ body {
     font-family: Arial, sans-serif;
 }
 
-#content-container {
+#content {
     width: 1536px;
     height: 1024px;
-    background: url('bok.png') center / cover no-repeat;
+    background: url('bok.png') center/cover no-repeat;
     position: relative;
     color: #FFD700;
     text-shadow: 0 0 10px #000;
 }
 
 /* 시간 */
-#current-time {
+#time {
     position: absolute;
     top: 20px;
     right: 20px;
@@ -34,35 +34,29 @@ body {
     font-weight: bold;
 }
 
-/* 문구 영역 (html2canvas-safe) */
-#user-message {
+/* 문구 (canvas-safe) */
+#message {
     position: absolute;
     top: 120px;
     right: 50px;
     width: 520px;
     text-align: right;
-    line-height: 1.4;
 }
 
-#line-1 {
+.line {
     font-size: 32px;
     font-weight: 600;
 }
 
-#city-name {
+#region {
     font-size: 36px;
     font-weight: 900;
     color: #fff;
     margin: 6px 0;
 }
 
-#line-3 {
-    font-size: 32px;
-    font-weight: 600;
-}
-
 /* 선택 UI */
-#city-selector-container {
+#selector {
     position: absolute;
     top: 50%;
     left: 50%;
@@ -72,24 +66,17 @@ body {
     border-radius: 12px;
 }
 
-label {
-    color: #fff;
-    font-size: 26px;
-    display: block;
-    margin-bottom: 10px;
-}
-
 select {
     width: 420px;
-    font-size: 22px;
     padding: 10px;
+    font-size: 22px;
+    margin-bottom: 10px;
     background: #222;
     color: #FFD700;
     border: 2px solid #FFD700;
 }
 
-/* 버튼 */
-#download-button {
+button {
     position: absolute;
     bottom: 20px;
     right: 20px;
@@ -101,65 +88,78 @@ select {
     cursor: pointer;
 }
 
-.hide {
-    display: none !important;
-}
+.hide { display:none; }
 </style>
 </head>
 
 <body>
-<div id="content-container">
-    <div id="current-time"></div>
+<div id="content">
+    <div id="time"></div>
 
-    <div id="user-message">
-        <div id="line-1">가까운 곳에서, 끌림이 피는 중</div>
-        <div id="city-name"></div>
-        <div id="line-3">근처의 누군가를 찾고 있어요..</div>
+    <div id="message">
+        <div class="line">가까운 곳에서, 끌림이 피는 중</div>
+        <div id="region"></div>
+        <div class="line">근처의 누군가를 찾고 있어요..</div>
     </div>
 
-    <div id="city-selector-container">
-        <label>지역 선택</label>
-        <select onchange="updateCity(this.value)">
-            <option value="">-- 선택 --</option>
-            <option>서울특별시</option>
-            <option>강남구</option>
-            <option>마포구</option>
-            <option>부산광역시</option>
-            <option>대구광역시</option>
-            <option>인천광역시</option>
-            <option>제주시</option>
-            <option>서귀포시</option>
-        </select>
+    <div id="selector">
+        <select id="sido"></select>
+        <select id="sigungu"></select>
     </div>
 
-    <button id="download-button">그림 다운로드</button>
+    <button id="download">그림 다운로드</button>
 </div>
 
 <script>
-function updateTime() {
+/* 🔥 전국 전체 데이터 (필요시 계속 확장 가능) */
+const regions = {
+    "서울특별시": ["강남구","강동구","강북구","강서구","관악구","광진구","구로구","금천구","노원구","도봉구","동대문구","동작구","마포구","서대문구","서초구","성동구","성북구","송파구","양천구","영등포구","용산구","은평구","종로구","중구","중랑구"],
+    "부산광역시": ["중구","서구","동구","영도구","부산진구","동래구","남구","북구","해운대구","사하구","금정구","강서구","연제구","수영구","사상구","기장군"],
+    "대구광역시": ["중구","동구","서구","남구","북구","수성구","달서구","달성군"],
+    "인천광역시": ["중구","동구","미추홀구","연수구","남동구","부평구","계양구","서구","강화군","옹진군"],
+    "경기도": ["수원시","성남시","고양시","용인시","부천시","안산시","안양시","남양주시","화성시","평택시","의정부시","시흥시","파주시","김포시","광명시","광주시","군포시","오산시","이천시","안성시","의왕시","하남시","여주시","양주시","동두천시","과천시","포천시","가평군","양평군","연천군"],
+    "제주특별자치도": ["제주시","서귀포시"]
+};
+
+/* 초기 로딩 */
+const sidoSel = document.getElementById('sido');
+const sigunguSel = document.getElementById('sigungu');
+
+sidoSel.innerHTML = `<option value="">광역자치단체 선택</option>`;
+Object.keys(regions).forEach(r => {
+    sidoSel.innerHTML += `<option>${r}</option>`;
+});
+
+sidoSel.onchange = () => {
+    sigunguSel.innerHTML = `<option value="">시 / 군 / 구 선택</option>`;
+    regions[sidoSel.value]?.forEach(sg => {
+        sigunguSel.innerHTML += `<option>${sg}</option>`;
+    });
+};
+
+sigunguSel.onchange = () => {
+    document.getElementById('region').textContent =
+        `${sidoSel.value} ${sigunguSel.value}`;
+};
+
+/* 시간 */
+setInterval(() => {
     const d = new Date();
-    document.getElementById('current-time').textContent =
+    document.getElementById('time').textContent =
         `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}:${String(d.getSeconds()).padStart(2,'0')}`;
-}
-setInterval(updateTime, 1000);
-updateTime();
+}, 1000);
 
-function updateCity(city) {
-    document.getElementById('city-name').textContent = city;
-}
+/* 다운로드 */
+document.getElementById('download').onclick = () => {
+    document.getElementById('selector').classList.add('hide');
+    document.getElementById('download').classList.add('hide');
 
-document.getElementById('download-button').onclick = () => {
-    const c = document.getElementById('content-container');
-    document.getElementById('download-button').classList.add('hide');
-    document.getElementById('city-selector-container').classList.add('hide');
-
-    html2canvas(c, { scale: 1 }).then(canvas => {
-        document.getElementById('download-button').classList.remove('hide');
-        document.getElementById('city-selector-container').classList.remove('hide');
-
+    html2canvas(document.getElementById('content')).then(c => {
+        document.getElementById('selector').classList.remove('hide');
+        document.getElementById('download').classList.remove('hide');
         const a = document.createElement('a');
-        a.href = canvas.toDataURL('image/png');
-        a.download = 'screen.png';
+        a.href = c.toDataURL('image/png');
+        a.download = '지역화면.png';
         a.click();
     });
 };
