@@ -1,144 +1,134 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>배경 이미지 시간 및 지역 선택 화면</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <style>
-        body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            background-color: #1a1a1a;
-            font-family: 'Arial', sans-serif;
-            overflow: hidden;
-        }
+<meta charset="UTF-8">
+<title>시간 + 지역 화면</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
-        #content-container {
-            width: 1536px;
-            height: 1024px;
-            background-image: url('bok.png');
-            background-size: 1536px 1024px;
-            background-repeat: no-repeat;
-            background-position: center;
+<style>
+body {
+    margin: 0;
+    background: #1a1a1a;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    font-family: Arial, sans-serif;
+}
 
-            position: relative;
-            color: #FFD700;
-            text-shadow: 0 0 10px rgba(0, 0, 0, 1), 0 0 20px rgba(0, 0, 0, 0.7);
-        }
+#content-container {
+    width: 1536px;
+    height: 1024px;
+    background: url('bok.png') center / cover no-repeat;
+    position: relative;
+    color: #FFD700;
+    text-shadow: 0 0 10px #000;
+}
 
-        #current-time {
-            font-size: 80px;
-            font-weight: bold;
-            letter-spacing: 3px;
-            position: absolute;
-            top: 20px;
-            right: 20px;
-        }
+/* 시간 */
+#current-time {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    font-size: 80px;
+    font-weight: bold;
+}
 
-        /* 🔥 문구 영역 – flex 구조 */
-        #user-message {
-            position: absolute;
-            top: 120px;
-            right: 0;
-            width: 520px;
-            padding: 0 50px;
+/* 문구 영역 (html2canvas-safe) */
+#user-message {
+    position: absolute;
+    top: 120px;
+    right: 50px;
+    width: 520px;
+    text-align: right;
+    line-height: 1.4;
+}
 
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: flex-end;
-            align-items: center;
-            gap: 8px;
+#line-1 {
+    font-size: 32px;
+    font-weight: 600;
+}
 
-            font-size: 32px;
-            font-weight: 600;
-            line-height: 1.4;
-            text-align: right;
-        }
+#city-name {
+    font-size: 36px;
+    font-weight: 900;
+    color: #fff;
+    margin: 6px 0;
+}
 
-        #user-message span {
-            white-space: nowrap;
-        }
+#line-3 {
+    font-size: 32px;
+    font-weight: 600;
+}
 
-        #city-name {
-            font-weight: 900;
-            color: #ffffff;
-        }
+/* 선택 UI */
+#city-selector-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0,0,0,.6);
+    padding: 25px 40px;
+    border-radius: 12px;
+}
 
-        #city-selector-container {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background-color: rgba(0, 0, 0, 0.6);
-            padding: 25px 40px;
-            border-radius: 12px;
-            z-index: 5;
-            text-align: center;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
-        }
+label {
+    color: #fff;
+    font-size: 26px;
+    display: block;
+    margin-bottom: 10px;
+}
 
-        #city-selector-container label {
-            font-size: 28px;
-            font-weight: bold;
-            display: block;
-            margin-bottom: 15px;
-            color: #ffffff;
-        }
+select {
+    width: 420px;
+    font-size: 22px;
+    padding: 10px;
+    background: #222;
+    color: #FFD700;
+    border: 2px solid #FFD700;
+}
 
-        #city-select {
-            padding: 12px 20px;
-            font-size: 24px;
-            width: 400px;
-            border-radius: 8px;
-            border: 2px solid #FFD700;
-            background-color: #222;
-            color: #FFD700;
-            cursor: pointer;
-        }
+/* 버튼 */
+#download-button {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    padding: 14px 28px;
+    font-size: 20px;
+    background: rgba(0,0,0,.3);
+    color: #fff;
+    border: 2px solid #FFD700;
+    cursor: pointer;
+}
 
-        #download-button {
-            position: absolute;
-            bottom: 20px;
-            right: 20px;
-            padding: 15px 30px;
-            font-size: 20px;
-            cursor: pointer;
-            background-color: rgba(0, 0, 0, 0.3);
-            color: #ffffff;
-            border: 2px solid #FFD700;
-            border-radius: 8px;
-            z-index: 10;
-        }
-
-        .hide-on-capture {
-            display: none !important;
-        }
-    </style>
+.hide {
+    display: none !important;
+}
+</style>
 </head>
-<body>
 
+<body>
 <div id="content-container">
     <div id="current-time"></div>
 
-    <!-- ✅ 문구 구조 분리 -->
     <div id="user-message">
-        <span>가까운 곳에서, 끌림이 피는 중</span>
-        <span id="city-name"></span>
-        <span>근처의 누군가를 찾고 있어요..</span>
+        <div id="line-1">가까운 곳에서, 끌림이 피는 중</div>
+        <div id="city-name"></div>
+        <div id="line-3">근처의 누군가를 찾고 있어요..</div>
     </div>
 
     <div id="city-selector-container">
-        <label for="city-select">지역 선택</label>
-        <select id="city-select" onchange="updateMessage(this.value)">
-            <option value="">-- 도시/군/구 선택 --</option>
-            <option value="강남구">강남구</option>
-            <option value="마포구">마포구</option>
-            <option value="부산광역시">부산광역시</option>
-            <option value="제주시">제주시</option>
+        <label>지역 선택</label>
+        <select onchange="updateCity(this.value)">
+            <option value="">-- 선택 --</option>
+            <option>서울특별시</option>
+            <option>강남구</option>
+            <option>마포구</option>
+            <option>부산광역시</option>
+            <option>대구광역시</option>
+            <option>인천광역시</option>
+            <option>제주시</option>
+            <option>서귀포시</option>
         </select>
     </div>
 
@@ -146,43 +136,33 @@
 </div>
 
 <script>
-    function updateTime() {
-        const now = new Date();
-        const h = String(now.getHours()).padStart(2, '0');
-        const m = String(now.getMinutes()).padStart(2, '0');
-        const s = String(now.getSeconds()).padStart(2, '0');
-        document.getElementById('current-time').textContent = `${h}:${m}:${s}`;
-    }
-    setInterval(updateTime, 1000);
-    updateTime();
+function updateTime() {
+    const d = new Date();
+    document.getElementById('current-time').textContent =
+        `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}:${String(d.getSeconds()).padStart(2,'0')}`;
+}
+setInterval(updateTime, 1000);
+updateTime();
 
-    function updateMessage(city) {
-        document.getElementById('city-name').textContent = city ? city : '';
-    }
+function updateCity(city) {
+    document.getElementById('city-name').textContent = city;
+}
 
-    document.getElementById('download-button').addEventListener('click', () => {
-        const container = document.getElementById('content-container');
-        const button = document.getElementById('download-button');
-        const selector = document.getElementById('city-selector-container');
+document.getElementById('download-button').onclick = () => {
+    const c = document.getElementById('content-container');
+    document.getElementById('download-button').classList.add('hide');
+    document.getElementById('city-selector-container').classList.add('hide');
 
-        button.classList.add('hide-on-capture');
-        selector.classList.add('hide-on-capture');
+    html2canvas(c, { scale: 1 }).then(canvas => {
+        document.getElementById('download-button').classList.remove('hide');
+        document.getElementById('city-selector-container').classList.remove('hide');
 
-        html2canvas(container, {
-            width: 1536,
-            height: 1024,
-            scale: 1
-        }).then(canvas => {
-            button.classList.remove('hide-on-capture');
-            selector.classList.remove('hide-on-capture');
-
-            const link = document.createElement('a');
-            link.href = canvas.toDataURL('image/png');
-            link.download = '시간_지역_화면.png';
-            link.click();
-        });
+        const a = document.createElement('a');
+        a.href = canvas.toDataURL('image/png');
+        a.download = 'screen.png';
+        a.click();
     });
+};
 </script>
-
 </body>
 </html>
