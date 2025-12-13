@@ -6,7 +6,6 @@
     <title>배경 이미지 시간 및 지역 선택 화면</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
-        /* 페이지 전체 스타일 설정 */
         body {
             display: flex;
             justify-content: center;
@@ -18,30 +17,63 @@
             overflow: hidden;
         }
 
-        /* 메인 컨테이너 (1536x1024 크기) */
         #content-container {
             width: 1536px;
             height: 1024px;
-            background-image: url('bok.png'); 
-            background-size: 1536px 1024px; 
+            background-image: url('bok.png');
+            background-size: 1536px 1024px;
             background-repeat: no-repeat;
             background-position: center;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
+
             position: relative;
-            color: #FFD700; 
+            color: #FFD700;
             text-shadow: 0 0 10px rgba(0, 0, 0, 1), 0 0 20px rgba(0, 0, 0, 0.7);
         }
-        
-        /* 도시 선택기 컨테이너 스타일 (중앙 위치) */
+
+        #current-time {
+            font-size: 80px;
+            font-weight: bold;
+            letter-spacing: 3px;
+            position: absolute;
+            top: 20px;
+            right: 20px;
+        }
+
+        /* 🔥 문구 영역 – flex 구조 */
+        #user-message {
+            position: absolute;
+            top: 120px;
+            right: 0;
+            width: 520px;
+            padding: 0 50px;
+
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 8px;
+
+            font-size: 32px;
+            font-weight: 600;
+            line-height: 1.4;
+            text-align: right;
+        }
+
+        #user-message span {
+            white-space: nowrap;
+        }
+
+        #city-name {
+            font-weight: 900;
+            color: #ffffff;
+        }
+
         #city-selector-container {
             position: absolute;
-            top: 50%; 
+            top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background-color: rgba(0, 0, 0, 0.6); 
+            background-color: rgba(0, 0, 0, 0.6);
             padding: 25px 40px;
             border-radius: 12px;
             z-index: 5;
@@ -54,51 +86,20 @@
             font-weight: bold;
             display: block;
             margin-bottom: 15px;
-            color: #ffffff; 
+            color: #ffffff;
         }
-        
+
         #city-select {
             padding: 12px 20px;
             font-size: 24px;
-            width: 400px; 
+            width: 400px;
             border-radius: 8px;
             border: 2px solid #FFD700;
             background-color: #222;
-            color: #FFD700; 
+            color: #FFD700;
             cursor: pointer;
-            max-height: 400px; 
         }
 
-        /* 실시간 시간 스타일 */
-        #current-time {
-            font-size: 80px;
-            font-weight: bold;
-            letter-spacing: 3px;
-            position: absolute;
-            top: 20px; 
-            right: 20px;
-        }
-
-        /* ✨ 사용자 문구 스타일 (Flexbox 적용으로 수직 정렬 강제) */
-        #user-message {
-            font-size: 32px; 
-            font-weight: 600;
-            text-align: right; 
-            line-height: 1.5;
-            padding: 0 50px;
-            position: absolute;
-            top: 120px;
-            right: 0px; 
-            width: 500px;
-            
-            /* 핵심 수정 부분 */
-            display: flex;
-            justify-content: flex-end; 
-            align-items: center; 
-            flex-wrap: wrap; 
-        }
-        
-        /* 다운로드 버튼 스타일 */
         #download-button {
             position: absolute;
             bottom: 20px;
@@ -106,20 +107,13 @@
             padding: 15px 30px;
             font-size: 20px;
             cursor: pointer;
-            background-color: rgba(0, 0, 0, 0.3); 
+            background-color: rgba(0, 0, 0, 0.3);
             color: #ffffff;
-            border: 2px solid #FFD700; 
+            border: 2px solid #FFD700;
             border-radius: 8px;
-            backdrop-filter: blur(5px);
-            transition: background-color 0.3s;
             z-index: 10;
         }
 
-        #download-button:hover {
-            background-color: rgba(0, 0, 0, 0.5);
-        }
-
-        /* 다운로드 시 버튼 숨김을 위한 클래스 */
         .hide-on-capture {
             display: none !important;
         }
@@ -127,155 +121,68 @@
 </head>
 <body>
 
-    <div id="content-container">
-        <div id="current-time"></div>
-        <div id="user-message">
-            <span id="message-prefix">(가까운 곳에서, 끌림이 피는 중 </span>
-            <span id="city-placeholder">근처의 누군가를 찾고 있어요..)</span>
-        </div>
+<div id="content-container">
+    <div id="current-time"></div>
 
-        <div id="city-selector-container">
-            <label for="city-select">지역 선택 (대한민국 17개 광역자치단체 기준):</label>
-            <select id="city-select" onchange="updateMessage(this.value)" size="1">
-                <option value="none" disabled selected>-- 도시/군/구를 선택하세요 --</option>
-                
-                <optgroup label="서울특별시 (25구)">
-                    <option value="서울특별시">전체 서울특별시</option>
-                    <option value="강남구">강남구</option>
-                    <option value="강동구">강동구</option>
-                    <option value="종로구">종로구</option>
-                    <option value="마포구">마포구</option>
-                </optgroup>
-
-                <optgroup label="광역시 및 특별자치시">
-                    <option value="부산광역시">부산광역시</option>
-                    <option value="대구광역시">대구광역시</option>
-                    <option value="인천광역시">인천광역시</option>
-                    <option value="광주광역시">광주광역시</option>
-                    <option value="대전광역시">대전광역시</option>
-                    <option value="울산광역시">울산광역시</option>
-                    <option value="세종특별자치시">세종특별자치시</option>
-                </optgroup>
-
-                <optgroup label="경기도 (28시, 3군)">
-                    <option value="수원시">수원시</option>
-                    <option value="고양시">고양시</option>
-                    <option value="용인시">용인시</option>
-                    <option value="성남시">성남시</option>
-                    <option value="화성시">화성시</option>
-                </optgroup>
-
-                <optgroup label="강원특별자치도 (7시, 11군)">
-                    <option value="춘천시">춘천시</option>
-                    <option value="원주시">원주시</option>
-                    <option value="강릉시">강릉시</option>
-                    <option value="속초시">속초시</option>
-                    <option value="철원군">철원군</option>
-                </optgroup>
-                
-                <optgroup label="충청남/북도 (39개 시/군)">
-                    <option value="청주시">청주시</option>
-                    <option value="천안시">천안시</option>
-                    <option value="공주시">공주시</option>
-                    <option value="충주시">충주시</option>
-                </optgroup>
-
-                <optgroup label="전라남도/북도 (33개 시/군)">
-                    <option value="전주시">전주시</option>
-                    <option value="여수시">여수시</option>
-                    <option value="순천시">순천시</option>
-                    <option value="목포시">목포시</option>
-                    <option value="군산시">군산시</option>
-                </optgroup>
-
-                <optgroup label="경상남/북도 (50개 시/군)">
-                    <option value="창원시">창원시</option>
-                    <option value="포항시">포항시</option>
-                    <option value="구미시">구미시</option>
-                    <option value="김해시">김해시</option>
-                    <option value="진주시">진주시</option>
-                </optgroup>
-
-                <optgroup label="제주특별자치도 (2시)">
-                    <option value="제주시">제주시</option>
-                    <option value="서귀포시">서귀포시</option>
-                </optgroup>
-                
-            </select>
-        </div>
-
-        <button id="download-button">그림 다운로드</button>
+    <!-- ✅ 문구 구조 분리 -->
+    <div id="user-message">
+        <span>가까운 곳에서, 끌림이 피는 중</span>
+        <span id="city-name"></span>
+        <span>근처의 누군가를 찾고 있어요..</span>
     </div>
 
-    <script>
-        // 현재 시간을 업데이트하는 함수
-        function updateTime() {
-            const now = new Date();
-            const hours = String(now.getHours()).padStart(2, '0');
-            const minutes = String(now.getMinutes()).padStart(2, '0');
-            const seconds = String(now.getSeconds()).padStart(2, '0');
-            const timeString = `${hours}:${minutes}:${seconds}`;
-            document.getElementById('current-time').textContent = timeString;
-        }
+    <div id="city-selector-container">
+        <label for="city-select">지역 선택</label>
+        <select id="city-select" onchange="updateMessage(this.value)">
+            <option value="">-- 도시/군/구 선택 --</option>
+            <option value="강남구">강남구</option>
+            <option value="마포구">마포구</option>
+            <option value="부산광역시">부산광역시</option>
+            <option value="제주시">제주시</option>
+        </select>
+    </div>
 
-        setInterval(updateTime, 1000);
-        updateTime(); 
-        
-        // ✨ 선택된 도시에 따라 문구를 업데이트하는 함수 (Flexbox 구조에 맞게 수정)
-        function updateMessage(city) {
-            const messageElement = document.getElementById('user-message');
-            
-            // 기존의 innerHTML 전체 교체 방식 대신, 요소를 조작하여 Flexbox 정렬이 유지되도록 합니다.
-            // (가까운 곳에서, 끌림이 피는 중 </span> <-- prefix
-            // <span class="city-name">도시명</span>
-            // <span class="city-suffix">근처의 누군가를 찾고 있어요..)</span>
-            
-            let prefix = "(가까운 곳에서, 끌림이 피는 중 ";
-            let suffix = " 근처의 누군가를 찾고 있어요..)";
-            
-            if (city && city !== "none") {
-                // 도시가 선택된 경우: 도시 이름이 포함된 새로운 HTML 구성
-                messageElement.innerHTML = `
-                    <span>${prefix}</span>
-                    <span style="font-weight: 900; color: #fff;">${city}</span>
-                    <span>${suffix}</span>
-                `;
-            } else {
-                // 도시가 선택되지 않은 경우: 플레이스홀더 텍스트만 표시 (도시가 선택되지 않은 상태의 초기 문구)
-                messageElement.innerHTML = `<span>${prefix}근처의 누군가를 찾고 있어요..)</span>`;
-            }
-        }
-        
-        // 페이지 로드 시 초기 문구 설정 (Flexbox 구조에 맞춤)
-        document.addEventListener('DOMContentLoaded', () => {
-             document.getElementById('user-message').innerHTML = `<span>(가까운 곳에서, 끌림이 피는 중 근처의 누군가를 찾고 있어요..)</span>`;
+    <button id="download-button">그림 다운로드</button>
+</div>
+
+<script>
+    function updateTime() {
+        const now = new Date();
+        const h = String(now.getHours()).padStart(2, '0');
+        const m = String(now.getMinutes()).padStart(2, '0');
+        const s = String(now.getSeconds()).padStart(2, '0');
+        document.getElementById('current-time').textContent = `${h}:${m}:${s}`;
+    }
+    setInterval(updateTime, 1000);
+    updateTime();
+
+    function updateMessage(city) {
+        document.getElementById('city-name').textContent = city ? city : '';
+    }
+
+    document.getElementById('download-button').addEventListener('click', () => {
+        const container = document.getElementById('content-container');
+        const button = document.getElementById('download-button');
+        const selector = document.getElementById('city-selector-container');
+
+        button.classList.add('hide-on-capture');
+        selector.classList.add('hide-on-capture');
+
+        html2canvas(container, {
+            width: 1536,
+            height: 1024,
+            scale: 1
+        }).then(canvas => {
+            button.classList.remove('hide-on-capture');
+            selector.classList.remove('hide-on-capture');
+
+            const link = document.createElement('a');
+            link.href = canvas.toDataURL('image/png');
+            link.download = '시간_지역_화면.png';
+            link.click();
         });
+    });
+</script>
 
-        // 그림 다운로드 기능
-        document.getElementById('download-button').addEventListener('click', function() {
-            const container = document.getElementById('content-container');
-            const button = document.getElementById('download-button');
-            const selectorContainer = document.getElementById('city-selector-container'); 
-
-            // 캡처 전에 버튼과 선택기 숨기기
-            button.classList.add('hide-on-capture');
-            selectorContainer.classList.add('hide-on-capture');
-
-            html2canvas(container, {
-                width: 1536,
-                height: 1024,
-                scale: 1, 
-                logging: false,
-                useCORS: true 
-            }).then(canvas => {
-                // 캡처 후 버튼과 선택기 다시 표시
-                button.classList.remove('hide-on-capture');
-                selectorContainer.classList.remove('hide-on-capture');
-
-                const imageURL = canvas.toDataURL('image/png');
-                const link = document.createElement('a');
-                link.href = imageURL;
-                link.download = '시간_지역_화면.png';
-                document.body.appendChild(link);
-                link.click();
-                document
+</body>
+</html>
