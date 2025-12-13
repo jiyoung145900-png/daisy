@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>배경 이미지 시간 및 도시 선택 화면</title>
+    <title>배경 이미지 시간 및 지역 선택 화면</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         /* 페이지 전체 스타일 설정 */
@@ -41,17 +41,16 @@
             text-shadow: 0 0 10px rgba(0, 0, 0, 1), 0 0 20px rgba(0, 0, 0, 0.7);
         }
         
-        /* ------------------------------------------- */
-        /* ✨ 새로운 도시 선택기 컨테이너 스타일 */
+        /* 도시 선택기 컨테이너 스타일 */
         #city-selector-container {
             position: absolute;
             top: 50%; /* 화면 중간 위치 */
             left: 50%;
             transform: translate(-50%, -50%); /* 정확히 중앙 정렬 */
-            background-color: rgba(0, 0, 0, 0.6); /* 배경이 비치도록 반투명 검은색 */
+            background-color: rgba(0, 0, 0, 0.6); 
             padding: 25px 40px;
             border-radius: 12px;
-            z-index: 5; /* 시간/문구보다 높은 레이어 */
+            z-index: 5;
             text-align: center;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
         }
@@ -61,22 +60,22 @@
             font-weight: bold;
             display: block;
             margin-bottom: 15px;
-            color: #ffffff; /* 레이블은 흰색으로 대비 */
+            color: #ffffff; 
         }
         
         #city-select {
             padding: 12px 20px;
             font-size: 24px;
-            width: 400px; /* 드롭다운 너비 설정 */
+            width: 400px; 
             border-radius: 8px;
             border: 2px solid #FFD700;
             background-color: #222;
-            color: #FFD700; /* 선택 목록 글자색 */
+            color: #FFD700; 
             cursor: pointer;
+            max-height: 400px; /* 드롭다운 목록이 너무 길어지지 않게 최대 높이 지정 */
         }
-        /* ------------------------------------------- */
 
-        /* 실시간 시간 스타일 (기존과 동일) */
+        /* 실시간 시간 스타일 */
         #current-time {
             font-size: 80px;
             font-weight: bold;
@@ -86,7 +85,7 @@
             right: 20px;
         }
 
-        /* 사용자 문구 스타일 (기존과 동일) */
+        /* 사용자 문구 스타일 */
         #user-message {
             font-size: 32px; 
             font-weight: 600;
@@ -99,7 +98,7 @@
             width: 500px; 
         }
         
-        /* 다운로드 버튼 스타일 (기존과 동일) */
+        /* 다운로드 버튼 스타일 */
         #download-button {
             position: absolute;
             bottom: 20px;
@@ -135,44 +134,72 @@
         </div>
 
         <div id="city-selector-container">
-            <label for="city-select">지역 선택:</label>
-            <select id="city-select" onchange="updateMessage(this.value)">
-                <option value="none" disabled selected>-- 전국 도시를 선택하세요 --</option>
-                <optgroup label="서울/인천/경기 (수도권)">
-                    <option value="서울특별시">서울특별시</option>
+            <label for="city-select">지역 선택 (대한민국 17개 광역자치단체 기준):</label>
+            <select id="city-select" onchange="updateMessage(this.value)" size="1">
+                <option value="none" disabled selected>-- 도시/군/구를 선택하세요 --</option>
+                
+                <optgroup label="서울특별시 (25구)">
+                    <option value="서울특별시">전체 서울특별시</option>
+                    <option value="강남구">강남구</option>
+                    <option value="강동구">강동구</option>
+                    <option value="종로구">종로구</option>
+                    <option value="마포구">마포구</option>
+                    </optgroup>
+
+                <optgroup label="광역시 및 특별자치시">
+                    <option value="부산광역시">부산광역시</option>
+                    <option value="대구광역시">대구광역시</option>
                     <option value="인천광역시">인천광역시</option>
+                    <option value="광주광역시">광주광역시</option>
+                    <option value="대전광역시">대전광역시</option>
+                    <option value="울산광역시">울산광역시</option>
+                    <option value="세종특별자치시">세종특별자치시</option>
+                    </optgroup>
+
+                <optgroup label="경기도 (28시, 3군)">
                     <option value="수원시">수원시</option>
                     <option value="고양시">고양시</option>
                     <option value="용인시">용인시</option>
-                    <option value="가평군">가평군</option>
-                </optgroup>
-                <optgroup label="강원도">
+                    <option value="성남시">성남시</option>
+                    <option value="화성시">화성시</option>
+                    </optgroup>
+
+                <optgroup label="강원특별자치도 (7시, 11군)">
                     <option value="춘천시">춘천시</option>
                     <option value="원주시">원주시</option>
                     <option value="강릉시">강릉시</option>
+                    <option value="속초시">속초시</option>
+                    <option value="철원군">철원군</option>
                     </optgroup>
-                <optgroup label="충청남/북도, 대전, 세종">
-                    <option value="대전광역시">대전광역시</option>
-                    <option value="세종특별자치시">세종특별자치시</option>
+                
+                <optgroup label="충청남/북도 (39개 시/군)">
                     <option value="청주시">청주시</option>
                     <option value="천안시">천안시</option>
+                    <option value="공주시">공주시</option>
+                    <option value="충주시">충주시</option>
                     </optgroup>
-                <optgroup label="전라남/북도, 광주">
-                    <option value="광주광역시">광주광역시</option>
+
+                <optgroup label="전라남도/북도 (33개 시/군)">
                     <option value="전주시">전주시</option>
                     <option value="여수시">여수시</option>
+                    <option value="순천시">순천시</option>
+                    <option value="목포시">목포시</option>
+                    <option value="군산시">군산시</option>
                     </optgroup>
-                <optgroup label="경상남/북도, 부산, 대구, 울산">
-                    <option value="부산광역시">부산광역시</option>
-                    <option value="대구광역시">대구광역시</option>
-                    <option value="울산광역시">울산광역시</option>
+
+                <optgroup label="경상남/북도 (50개 시/군)">
                     <option value="창원시">창원시</option>
                     <option value="포항시">포항시</option>
+                    <option value="구미시">구미시</option>
+                    <option value="김해시">김해시</option>
+                    <option value="진주시">진주시</option>
                     </optgroup>
-                <optgroup label="제주도">
+
+                <optgroup label="제주특별자치도 (2시)">
                     <option value="제주시">제주시</option>
                     <option value="서귀포시">서귀포시</option>
                 </optgroup>
+                
                 </select>
         </div>
 
@@ -193,10 +220,11 @@
         setInterval(updateTime, 1000);
         updateTime(); 
         
-        // ✨ 선택된 도시에 따라 문구를 업데이트하는 함수
+        // 선택된 도시에 따라 문구를 업데이트하는 함수
         function updateMessage(city) {
             const messageElement = document.getElementById('user-message');
-            if (city !== "none") {
+            if (city && city !== "none") {
+                // 문구에 선택된 도시 이름을 삽입하고 흰색으로 강조
                 messageElement.innerHTML = `(가까운 곳에서, 끌림이 피는 중 <span style="font-weight: 900; color: #fff;">${city}</span> 근처의 누군가를 찾고 있어요..)`;
             } else {
                 messageElement.textContent = "(가까운 곳에서, 끌림이 피는 중 근처의 누군가를 찾고 있어요..)";
@@ -207,7 +235,7 @@
         document.getElementById('download-button').addEventListener('click', function() {
             const container = document.getElementById('content-container');
             const button = document.getElementById('download-button');
-            const selectorContainer = document.getElementById('city-selector-container'); // 선택기 컨테이너
+            const selectorContainer = document.getElementById('city-selector-container'); 
 
             // 캡처 전에 버튼과 선택기 숨기기
             button.classList.add('hide-on-capture');
