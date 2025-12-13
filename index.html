@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>배경 이미지 시간 표시 화면</title>
+    <title>배경 이미지 시간 및 도시 선택 화면</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         /* 페이지 전체 스타일 설정 */
@@ -36,18 +36,49 @@
             align-items: center;
             position: relative;
             
-            /* ✨ 글자색: 밝은 황금색 (#FFD700) */
+            /* 글자색 및 그림자 유지 */
             color: #FFD700; 
-            /* 그림자를 강화하여 배경의 어두운 부분과 밝은 부분 모두에서 가독성 확보 */
             text-shadow: 0 0 10px rgba(0, 0, 0, 1), 0 0 20px rgba(0, 0, 0, 0.7);
-            
-            /* ❌ 그림자 제거: 이 부분을 삭제하여 다운로드 이미지에 그림자가 생기지 않도록 수정했습니다. */
-            /* box-shadow: 0 0 30px rgba(0, 0, 0, 0.5); */ 
+        }
+        
+        /* ------------------------------------------- */
+        /* ✨ 새로운 도시 선택기 컨테이너 스타일 */
+        #city-selector-container {
+            position: absolute;
+            top: 50%; /* 화면 중간 위치 */
+            left: 50%;
+            transform: translate(-50%, -50%); /* 정확히 중앙 정렬 */
+            background-color: rgba(0, 0, 0, 0.6); /* 배경이 비치도록 반투명 검은색 */
+            padding: 25px 40px;
+            border-radius: 12px;
+            z-index: 5; /* 시간/문구보다 높은 레이어 */
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
         }
 
-        /* 실시간 시간 스타일 */
+        #city-selector-container label {
+            font-size: 28px;
+            font-weight: bold;
+            display: block;
+            margin-bottom: 15px;
+            color: #ffffff; /* 레이블은 흰색으로 대비 */
+        }
+        
+        #city-select {
+            padding: 12px 20px;
+            font-size: 24px;
+            width: 400px; /* 드롭다운 너비 설정 */
+            border-radius: 8px;
+            border: 2px solid #FFD700;
+            background-color: #222;
+            color: #FFD700; /* 선택 목록 글자색 */
+            cursor: pointer;
+        }
+        /* ------------------------------------------- */
+
+        /* 실시간 시간 스타일 (기존과 동일) */
         #current-time {
-            font-size: 80px; 
+            font-size: 80px;
             font-weight: bold;
             letter-spacing: 3px;
             position: absolute;
@@ -55,7 +86,7 @@
             right: 20px;
         }
 
-        /* 사용자 문구 스타일 */
+        /* 사용자 문구 스타일 (기존과 동일) */
         #user-message {
             font-size: 32px; 
             font-weight: 600;
@@ -68,7 +99,7 @@
             width: 500px; 
         }
         
-        /* 다운로드 버튼 스타일 */
+        /* 다운로드 버튼 스타일 (기존과 동일) */
         #download-button {
             position: absolute;
             bottom: 20px;
@@ -99,9 +130,50 @@
 
     <div id="content-container">
         <div id="current-time"></div>
-        
         <div id="user-message">
             (가까운 곳에서, 끌림이 피는 중 근처의 누군가를 찾고 있어요..)
+        </div>
+
+        <div id="city-selector-container">
+            <label for="city-select">지역 선택:</label>
+            <select id="city-select" onchange="updateMessage(this.value)">
+                <option value="none" disabled selected>-- 전국 도시를 선택하세요 --</option>
+                <optgroup label="서울/인천/경기 (수도권)">
+                    <option value="서울특별시">서울특별시</option>
+                    <option value="인천광역시">인천광역시</option>
+                    <option value="수원시">수원시</option>
+                    <option value="고양시">고양시</option>
+                    <option value="용인시">용인시</option>
+                    <option value="가평군">가평군</option>
+                </optgroup>
+                <optgroup label="강원도">
+                    <option value="춘천시">춘천시</option>
+                    <option value="원주시">원주시</option>
+                    <option value="강릉시">강릉시</option>
+                    </optgroup>
+                <optgroup label="충청남/북도, 대전, 세종">
+                    <option value="대전광역시">대전광역시</option>
+                    <option value="세종특별자치시">세종특별자치시</option>
+                    <option value="청주시">청주시</option>
+                    <option value="천안시">천안시</option>
+                    </optgroup>
+                <optgroup label="전라남/북도, 광주">
+                    <option value="광주광역시">광주광역시</option>
+                    <option value="전주시">전주시</option>
+                    <option value="여수시">여수시</option>
+                    </optgroup>
+                <optgroup label="경상남/북도, 부산, 대구, 울산">
+                    <option value="부산광역시">부산광역시</option>
+                    <option value="대구광역시">대구광역시</option>
+                    <option value="울산광역시">울산광역시</option>
+                    <option value="창원시">창원시</option>
+                    <option value="포항시">포항시</option>
+                    </optgroup>
+                <optgroup label="제주도">
+                    <option value="제주시">제주시</option>
+                    <option value="서귀포시">서귀포시</option>
+                </optgroup>
+                </select>
         </div>
 
         <button id="download-button">그림 다운로드</button>
@@ -120,13 +192,26 @@
 
         setInterval(updateTime, 1000);
         updateTime(); 
+        
+        // ✨ 선택된 도시에 따라 문구를 업데이트하는 함수
+        function updateMessage(city) {
+            const messageElement = document.getElementById('user-message');
+            if (city !== "none") {
+                messageElement.innerHTML = `(가까운 곳에서, 끌림이 피는 중 <span style="font-weight: 900; color: #fff;">${city}</span> 근처의 누군가를 찾고 있어요..)`;
+            } else {
+                messageElement.textContent = "(가까운 곳에서, 끌림이 피는 중 근처의 누군가를 찾고 있어요..)";
+            }
+        }
 
         // 그림 다운로드 기능
         document.getElementById('download-button').addEventListener('click', function() {
             const container = document.getElementById('content-container');
             const button = document.getElementById('download-button');
+            const selectorContainer = document.getElementById('city-selector-container'); // 선택기 컨테이너
 
+            // 캡처 전에 버튼과 선택기 숨기기
             button.classList.add('hide-on-capture');
+            selectorContainer.classList.add('hide-on-capture');
 
             html2canvas(container, {
                 width: 1536,
@@ -135,12 +220,14 @@
                 logging: false,
                 useCORS: true 
             }).then(canvas => {
+                // 캡처 후 버튼과 선택기 다시 표시
                 button.classList.remove('hide-on-capture');
+                selectorContainer.classList.remove('hide-on-capture');
 
                 const imageURL = canvas.toDataURL('image/png');
                 const link = document.createElement('a');
                 link.href = imageURL;
-                link.download = '시간_문구_화면.png';
+                link.download = '시간_지역_화면.png';
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
