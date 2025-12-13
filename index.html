@@ -36,39 +36,39 @@
             align-items: center;
             position: relative;
             
-            /* ✨ 글자색: 밝은 황금색 (#FFD700)으로 변경하여 갈색 배경과 대비 */
+            /* ✨ 글자색: 밝은 황금색 (#FFD700) */
             color: #FFD700; 
             /* 그림자를 강화하여 배경의 어두운 부분과 밝은 부분 모두에서 가독성 확보 */
             text-shadow: 0 0 10px rgba(0, 0, 0, 1), 0 0 20px rgba(0, 0, 0, 0.7);
-            box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+            
+            /* ❌ 그림자 제거: 이 부분을 삭제하여 다운로드 이미지에 그림자가 생기지 않도록 수정했습니다. */
+            /* box-shadow: 0 0 30px rgba(0, 0, 0, 0.5); */ 
         }
 
         /* 실시간 시간 스타일 */
         #current-time {
-            font-size: 80px; /* 시간 크기를 약간 줄여 오른쪽 상단에 배치 용이하게 함 */
+            font-size: 80px; 
             font-weight: bold;
             letter-spacing: 3px;
             position: absolute;
-            /* ✨ 위치 변경: 오른쪽 상단 구석에 배치 */
             top: 20px; 
             right: 20px;
         }
 
         /* 사용자 문구 스타일 */
         #user-message {
-            font-size: 32px; /* 문구 크기를 약간 줄여 시간 아래에 배치 용이하게 함 */
+            font-size: 32px; 
             font-weight: 600;
-            text-align: right; /* 오른쪽 정렬 */
+            text-align: right; 
             line-height: 1.5;
             padding: 0 50px;
             position: absolute;
-            /* ✨ 위치 변경: 오른쪽 상단 시간 아래에 배치 */
             top: 120px;
             right: 0px; 
-            width: 500px; /* 문구 영역 너비 지정 */
+            width: 500px; 
         }
         
-        /* 다운로드 버튼 스타일 (이전과 동일) */
+        /* 다운로드 버튼 스타일 */
         #download-button {
             position: absolute;
             bottom: 20px;
@@ -76,9 +76,9 @@
             padding: 15px 30px;
             font-size: 20px;
             cursor: pointer;
-            background-color: rgba(0, 0, 0, 0.3); /* 배경에 맞춰 어두운 반투명으로 변경 */
+            background-color: rgba(0, 0, 0, 0.3); 
             color: #ffffff;
-            border: 2px solid #FFD700; /* 테두리도 황금색으로 */
+            border: 2px solid #FFD700; 
             border-radius: 8px;
             backdrop-filter: blur(5px);
             transition: background-color 0.3s;
@@ -121,7 +121,7 @@
         setInterval(updateTime, 1000);
         updateTime(); 
 
-        // 그림 다운로드 기능 (이전과 동일)
+        // 그림 다운로드 기능
         document.getElementById('download-button').addEventListener('click', function() {
             const container = document.getElementById('content-container');
             const button = document.getElementById('download-button');
