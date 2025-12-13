@@ -8,13 +8,13 @@
 <style>
 /* ================= 위치 조절용 변수 ================= */
 :root {
-    /* 전체 문구 위치 */
-    --message-move-x: 150px;   /* ← 왼쪽 (+) / 오른쪽 (-) */
-    --message-move-y: 730px;    /* ↓ 아래 (+) / 위 (-) */
+    /* 전체 문구 블록 이동 */
+    --message-move-x: 150px;   /* ← 왼쪽 + / 오른쪽 - */
+    --message-move-y: 730px;   /* ↓ 아래 + / 위 - */
 
-    /* 시 · 군 · 구(지역명)만 개별 조절 */
-    --region-offset-x: -120px;    /* ← → */
-    --region-offset-y: 6px;    /* ↑ ↓ */
+    /* 🔥 시 · 군 · 구 미세 조정 (앞 문구 기준) */
+    --region-offset-x: -120px; /* ← → */
+    --region-offset-y: -6px;   /* ↑ ↓ */
 }
 /* =================================================== */
 
@@ -52,13 +52,20 @@ body {
     top: calc(120px + var(--message-move-y));
     right: calc(50px + var(--message-move-x));
     width: 520px;
-    text-align: right;
+}
+
+/* 문구 묶음 (기준 잡는 핵심) */
+#line-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end; /* 오른쪽 기준 */
 }
 
 .line {
     font-size: 32px;
     font-weight: 600;
     line-height: 1;
+    margin: 0;
 }
 
 /* 시 · 군 · 구 */
@@ -66,8 +73,9 @@ body {
     font-size: 36px;
     font-weight: 900;
     color: #fff;
-    margin: 6px 0;
+
     line-height: 1;
+    margin: 2px 0; /* 앞 문구 기준 자연 간격 */
 
     position: relative;
     left: var(--region-offset-x);
@@ -116,9 +124,11 @@ button {
     <div id="time"></div>
 
     <div id="message">
-        <div class="line">가까운 곳에서, 끌림이 피는 중</div>
-        <div id="region"></div>
-        <div class="line">근처의 누군가를 찾고 있어요..</div>
+        <div id="line-wrapper">
+            <div class="line">가까운 곳에서, 끌림이 피는 중</div>
+            <div id="region"></div>
+            <div class="line">근처의 누군가를 찾고 있어요..</div>
+        </div>
     </div>
 
     <div id="selector">
