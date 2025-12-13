@@ -8,8 +8,13 @@
 <style>
 /* ================= 위치 조절용 변수 ================= */
 :root {
-    --message-move-x: 150px; /* ← 왼쪽으로 이동 */
-    --message-move-y: 50px;  /* ↓ 아래로 이동 */
+    /* 전체 문구 위치 */
+    --message-move-x: 150px;   /* ← 왼쪽 (+) / 오른쪽 (-) */
+    --message-move-y: 50px;    /* ↓ 아래 (+) / 위 (-) */
+
+    /* 시 · 군 · 구(지역명)만 개별 조절 */
+    --region-offset-x: 0px;    /* ← → */
+    --region-offset-y: 0px;    /* ↑ ↓ */
 }
 /* =================================================== */
 
@@ -41,7 +46,7 @@ body {
     font-weight: bold;
 }
 
-/* 문구 */
+/* 문구 전체 */
 #message {
     position: absolute;
     top: calc(120px + var(--message-move-y));
@@ -56,12 +61,17 @@ body {
     line-height: 1;
 }
 
+/* 시 · 군 · 구 */
 #region {
     font-size: 36px;
     font-weight: 900;
     color: #fff;
     margin: 6px 0;
     line-height: 1;
+
+    position: relative;
+    left: var(--region-offset-x);
+    top: var(--region-offset-y);
 }
 
 /* 선택 UI */
