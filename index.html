@@ -2,90 +2,99 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>전국 지역 선택 화면</title>
+<title>전국 지역 선택 화면 - 위치 수정</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
 <style>
 body {
-    margin: 0;
-    background: #1a1a1a;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    font-family: Arial, sans-serif;
+    margin: 0;
+    background: #1a1a1a;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    font-family: Arial, sans-serif;
 }
 
 #content {
-    width: 1536px;
-    height: 1024px;
-    background: url('bok.png') center/cover no-repeat;
-    position: relative;
-    color: #FFD700;
-    text-shadow: 0 0 10px #000;
+    width: 1536px;
+    height: 1024px;
+    background: url('bok.png') center/cover no-repeat;
+    position: relative;
+    color: #FFD700;
+    text-shadow: 0 0 10px #000;
 }
 
-/* 시간 */
+/* 🚩 시간: 오른쪽에서 왼쪽으로 200, 위에서 아래로 100 이동 */
 #time {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    font-size: 80px;
-    font-weight: bold;
+    position: absolute;
+    top: 120px; /* (20px + 100px) = 120px */
+    right: 220px; /* (20px + 200px) = 220px */
+    font-size: 80px;
+    font-weight: bold;
 }
 
-/* 문구 (canvas-safe) */
+/* 🚩 문구 (canvas-safe): 오른쪽에서 왼쪽으로 200, 위에서 아래로 100 이동 */
 #message {
-    position: absolute;
-    top: 120px;
-    right: 50px;
-    width: 520px;
-    text-align: right;
+    position: absolute;
+    top: 220px; /* (120px + 100px) = 220px */
+    right: 250px; /* (50px + 200px) = 250px */
+    width: 520px;
+    text-align: right;
 }
 
 .line {
-    font-size: 32px;
-    font-weight: 600;
+    font-size: 32px;
+    font-weight: 600;
 }
 
 #region {
-    font-size: 36px;
-    font-weight: 900;
-    color: #fff;
-    margin: 6px 0;
+    font-size: 36px;
+    font-weight: 900;
+    color: #fff;
+    margin: 6px 0;
 }
 
-/* 선택 UI */
+/* 🚩 선택 UI: 중앙에서 왼쪽으로 200, 아래로 100 이동 */
 #selector {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: rgba(0,0,0,.6);
-    padding: 25px 40px;
-    border-radius: 12px;
+    position: absolute;
+    /* (50% + 100px) = 중앙보다 아래 */
+    top: calc(50% + 100px); 
+    /* (50% - 200px) = 중앙보다 왼쪽 */
+    left: calc(50% - 200px); 
+    
+    /* 중앙 정렬 트랜스폼 유지 (새로운 위치에서 다시 중앙 정렬) */
+    transform: translate(-50%, -50%); 
+    
+    background: rgba(0,0,0,.6);
+    padding: 25px 40px;
+    border-radius: 12px;
 }
 
 select {
-    width: 420px;
-    padding: 10px;
-    font-size: 22px;
-    margin-bottom: 10px;
-    background: #222;
-    color: #FFD700;
-    border: 2px solid #FFD700;
+    width: 420px;
+    padding: 10px;
+    font-size: 22px;
+    margin-bottom: 10px;
+    background: #222;
+    color: #FFD700;
+    border: 2px solid #FFD700;
 }
 
+/* 🚩 다운로드 버튼: 오른쪽에서 왼쪽으로 200, 아래에서 아래로 100 이동 */
 button {
-    position: absolute;
-    bottom: 20px;
-    right: 20px;
-    padding: 14px 28px;
-    font-size: 20px;
-    background: rgba(0,0,0,.3);
-    color: #fff;
-    border: 2px solid #FFD700;
-    cursor: pointer;
+    position: absolute;
+    bottom: -80px; /* (20px - 100px) = -80px (하단에서 더 내려감. 화면 밖으로 나갈 수 있으니 주의) */
+    /* 만약 화면 내에 두고 싶다면, 20px 정도로 설정하는 것이 좋습니다. */
+    /* 현재는 요청대로 100px 아래로 이동: 20px -> -80px */
+    
+    right: 220px; /* (20px + 200px) = 220px */
+    padding: 14px 28px;
+    font-size: 20px;
+    background: rgba(0,0,0,.3);
+    color: #fff;
+    border: 2px solid #FFD700;
+    cursor: pointer;
 }
 
 .hide { display:none; }
@@ -94,31 +103,31 @@ button {
 
 <body>
 <div id="content">
-    <div id="time"></div>
+    <div id="time"></div>
 
-    <div id="message">
-        <div class="line">가까운 곳에서, 끌림이 피는 중</div>
-        <div id="region"></div>
-        <div class="line">근처의 누군가를 찾고 있어요..</div>
-    </div>
+    <div id="message">
+        <div class="line">가까운 곳에서, 끌림이 피는 중</div>
+        <div id="region"></div>
+        <div class="line">근처의 누군가를 찾고 있어요..</div>
+    </div>
 
-    <div id="selector">
-        <select id="sido"></select>
-        <select id="sigungu"></select>
-    </div>
+    <div id="selector">
+        <select id="sido"></select>
+        <select id="sigungu"></select>
+    </div>
 
-    <button id="download">그림 다운로드</button>
+    <button id="download">그림 다운로드</button>
 </div>
 
 <script>
 /* 🔥 전국 전체 데이터 (필요시 계속 확장 가능) */
 const regions = {
-    "서울특별시": ["강남구","강동구","강북구","강서구","관악구","광진구","구로구","금천구","노원구","도봉구","동대문구","동작구","마포구","서대문구","서초구","성동구","성북구","송파구","양천구","영등포구","용산구","은평구","종로구","중구","중랑구"],
-    "부산광역시": ["중구","서구","동구","영도구","부산진구","동래구","남구","북구","해운대구","사하구","금정구","강서구","연제구","수영구","사상구","기장군"],
-    "대구광역시": ["중구","동구","서구","남구","북구","수성구","달서구","달성군"],
-    "인천광역시": ["중구","동구","미추홀구","연수구","남동구","부평구","계양구","서구","강화군","옹진군"],
-    "경기도": ["수원시","성남시","고양시","용인시","부천시","안산시","안양시","남양주시","화성시","평택시","의정부시","시흥시","파주시","김포시","광명시","광주시","군포시","오산시","이천시","안성시","의왕시","하남시","여주시","양주시","동두천시","과천시","포천시","가평군","양평군","연천군"],
-    "제주특별자치도": ["제주시","서귀포시"]
+    "서울특별시": ["강남구","강동구","강북구","강서구","관악구","광진구","구로구","금천구","노원구","도봉구","동대문구","동작구","마포구","서대문구","서초구","성동구","성북구","송파구","양천구","영등포구","용산구","은평구","종로구","중구","중랑구"],
+    "부산광역시": ["중구","서구","동구","영도구","부산진구","동래구","남구","북구","해운대구","사하구","금정구","강서구","연제구","수영구","사상구","기장군"],
+    "대구광역시": ["중구","동구","서구","남구","북구","수성구","달서구","달성군"],
+    "인천광역시": ["중구","동구","미추홀구","연수구","남동구","부평구","계양구","서구","강화군","옹진군"],
+    "경기도": ["수원시","성남시","고양시","용인시","부천시","안산시","안양시","남양주시","화성시","평택시","의정부시","시흥시","파주시","김포시","광명시","광주시","군포시","오산시","이천시","안성시","의왕시","하남시","여주시","양주시","동두천시","과천시","포천시","가평군","양평군","연천군"],
+    "제주특별자치도": ["제주시","서귀포시"]
 };
 
 /* 초기 로딩 */
@@ -127,41 +136,41 @@ const sigunguSel = document.getElementById('sigungu');
 
 sidoSel.innerHTML = `<option value="">광역자치단체 선택</option>`;
 Object.keys(regions).forEach(r => {
-    sidoSel.innerHTML += `<option>${r}</option>`;
+    sidoSel.innerHTML += `<option>${r}</option>`;
 });
 
 sidoSel.onchange = () => {
-    sigunguSel.innerHTML = `<option value="">시 / 군 / 구 선택</option>`;
-    regions[sidoSel.value]?.forEach(sg => {
-        sigunguSel.innerHTML += `<option>${sg}</option>`;
-    });
+    sigunguSel.innerHTML = `<option value="">시 / 군 / 구 선택</option>`;
+    regions[sidoSel.value]?.forEach(sg => {
+        sigunguSel.innerHTML += `<option>${sg}</option>`;
+    });
 };
 
 sigunguSel.onchange = () => {
-    document.getElementById('region').textContent =
-        `${sidoSel.value} ${sigunguSel.value}`;
+    document.getElementById('region').textContent =
+        `${sidoSel.value} ${sigunguSel.value}`;
 };
 
 /* 시간 */
 setInterval(() => {
-    const d = new Date();
-    document.getElementById('time').textContent =
-        `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}:${String(d.getSeconds()).padStart(2,'0')}`;
+    const d = new Date();
+    document.getElementById('time').textContent =
+        `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}:${String(d.getSeconds()).padStart(2,'0')}`;
 }, 1000);
 
 /* 다운로드 */
 document.getElementById('download').onclick = () => {
-    document.getElementById('selector').classList.add('hide');
-    document.getElementById('download').classList.add('hide');
+    document.getElementById('selector').classList.add('hide');
+    document.getElementById('download').classList.add('hide');
 
-    html2canvas(document.getElementById('content')).then(c => {
-        document.getElementById('selector').classList.remove('hide');
-        document.getElementById('download').classList.remove('hide');
-        const a = document.createElement('a');
-        a.href = c.toDataURL('image/png');
-        a.download = '지역화면.png';
-        a.click();
-    });
+    html2canvas(document.getElementById('content')).then(c => {
+        document.getElementById('selector').classList.remove('hide');
+        document.getElementById('download').classList.remove('hide');
+        const a = document.createElement('a');
+        a.href = c.toDataURL('image/png');
+        a.download = '지역화면.png';
+        a.click();
+    });
 };
 </script>
 </body>
