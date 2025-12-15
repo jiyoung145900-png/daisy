@@ -97,19 +97,20 @@ select {
     border: 2px solid #FFD700;
 }
 
-button {
+#capture-btn {
     position: absolute;
     bottom: 20px;
     right: 20px;
     padding: 14px 28px;
     font-size: 20px;
-    background: rgba(0,0,0,.3);
+    background: rgba(255,105,180, 0.6); /* 핑크색으로 변경 */
     color: #fff;
     border: 2px solid #FFD700;
     cursor: pointer;
+    font-weight: bold;
 }
 
-.hide { display:none; }
+.hide { display:none !important; } /* !important 추가하여 확실히 숨김 */
 </style>
 </head>
 
@@ -119,7 +120,7 @@ button {
 
     <div id="message">
         <div class="line">가까운 곳에서, 끌림이 피는 중</div>
-        <div id="region"></div>
+        <div id="region">지역을 선택해 주세요</div>
         <div class="line">근처의 누군가를 찾고 있어요..</div>
     </div>
 
@@ -128,7 +129,7 @@ button {
         <select id="sigungu"></select>
     </div>
 
-    <button id="download">그림 다운로드</button>
+    <button id="capture-btn">📸 화면 캡처</button>
 </div>
 
 <script>
@@ -143,17 +144,22 @@ const regions = {
 
 const sido = document.getElementById('sido');
 const sigungu = document.getElementById('sigungu');
+const regionDisplay = document.getElementById('region');
 
+// 초기값 설정
 sido.innerHTML = `<option value="">광역자치단체 선택</option>`;
 Object.keys(regions).forEach(r => sido.innerHTML += `<option>${r}</option>`);
+sigungu.innerHTML = `<option value="">시 / 군 / 구 선택</option>`;
+regionDisplay.textContent = "지역을 선택해 주세요"; // 초기 메시지 설정
 
 sido.onchange = () => {
     sigungu.innerHTML = `<option value="">시 / 군 / 구 선택</option>`;
     regions[sido.value]?.forEach(sg => sigungu.innerHTML += `<option>${sg}</option>`);
+    regionDisplay.textContent = sido.value || "지역을 선택해 주세요"; 
 };
 
 sigungu.onchange = () => {
-    document.getElementById('region').textContent =
+    regionDisplay.textContent =
         `${sido.value} ${sigungu.value}`;
 };
 
@@ -164,18 +170,40 @@ setInterval(() => {
         `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}:${String(d.getSeconds()).padStart(2,'0')}`;
 }, 1000);
 
-/* 다운로드 */
-document.getElementById('download').onclick = () => {
-    document.getElementById('selector').classList.add('hide');
-    document.getElementById('download').classList.add('hide');
+/* 캡처 기능 (새 탭에서 이미지 열기) */
+document.getElementById('capture-btn').onclick = () => {
+    const content = document.getElementById('content');
+    const selector = document.getElementById('selector');
+    const captureBtn = document.getElementById('capture-btn');
 
-    html2canvas(document.getElementById('content')).then(c => {
-        document.getElementById('selector').classList.remove('hide');
-        document.getElementById('download').classList.remove('hide');
-        const a = document.createElement('a');
-        a.href = c.toDataURL('image/png');
-        a.download = '지역화면.png';
-        a.click();
+    // 캡처 전에 UI 숨김
+    selector.classList.add('hide');
+    captureBtn.classList.add('hide');
+
+    html2canvas(content, {
+        scale: 2, 
+        useCORS: true,
+        // 캡처 대상에서 제외할 요소를 명시적으로 처리할 필요 없이, 이미 클래스 'hide'로 숨겼습니다.
+    }).then(canvas => {
+        // 캡처 후 UI 다시 표시
+        selector.classList.remove('hide');
+        captureBtn.classList.remove('hide');
+        
+        const dataURL = canvas.toDataURL('image/png');
+
+        // 새 탭을 열어 캡처된 이미지를 보여줍니다.
+        const newWindow = window.open();
+        newWindow.document.write('<img src="' + dataURL + '" alt="캡처된 이미지" style="max-width: 100%; height: auto;">');
+        newWindow.document.title = '지역화면 캡처';
+
+        alert(`✅ 화면 캡처가 완료되었습니다. 새 탭에서 이미지를 확인하고 저장해주세요.`);
+        
+    }).catch(err => {
+        // 에러 발생 시 숨겼던 UI 다시 표시
+        selector.classList.remove('hide');
+        captureBtn.classList.remove('hide');
+        console.error("캡처 실패:", err);
+        alert("❌ 화면 캡처에 실패했습니다. (콘솔 로그 확인)");
     });
 };
 </script>
