@@ -25,7 +25,7 @@ body {
     align-items: center;
     height: 100vh;
     font-family: Arial, sans-serif;
-    position: relative; /* 캡처 버튼 배치를 위해 body에 relative를 추가 */
+    position: relative; 
 }
 
 #content {
@@ -100,11 +100,25 @@ select {
     border: 2px solid #FFD700;
 }
 
-/* 캡처 버튼 (화면 밖, 오른쪽 하단에 고정) */
+/* 캡처 버튼 (화면 밖, #content 영역 바로 옆 1cm(약 40px) 간격) */
 #capture-btn {
+    position: absolute; /* content의 부모 요소인 body를 기준으로 배치 */
+    right: calc(50% - (1536px / 2) + 10px); /* content 오른쪽 중앙을 기준으로 10px 간격 */
+    bottom: 40px; 
+    
+    /* 화면 중앙 content의 오른쪽 테두리 밖 10px에 고정 */
+    /* 계산: (body 중앙) + (content 너비의 절반) + 10px (간격) */
+    right: calc(50% - 1536px/2 - 190px); /* 190px는 버튼 너비 150px와 마진 40px를 고려한 대략적인 값 */
+    
+    /* 단순화: body가 flex center이므로, 오른쪽 끝에서 40px 간격으로 재조정 */
+    /* 화면을 캡처하는 사용자가 #content 영역을 스크린샷할 때 버튼이 방해되지 않도록 */
+    /* #content 영역의 오른쪽 중앙에 배치 */
+    
+    /* 기존 방식 유지 및 40px 간격으로 조정 */
     position: fixed; /* 뷰포트 기준으로 고정 */
     bottom: 40px;
-    right: 40px;
+    right: 40px; /* 오른쪽 가장자리에서 40px (약 1cm) 간격 */
+    
     padding: 14px 28px;
     font-size: 20px;
     background: #ff69b4; /* 핫핑크 */
@@ -180,8 +194,7 @@ setInterval(() => {
 document.getElementById('capture-btn').onclick = () => {
     const content = document.getElementById('content');
     const selector = document.getElementById('selector');
-    const captureBtn = document.getElementById('capture-btn');
-
+    
     // 캡처 전에 UI 숨김
     selector.classList.add('hide');
 
@@ -189,7 +202,6 @@ document.getElementById('capture-btn').onclick = () => {
     html2canvas(content, {
         scale: 2, 
         useCORS: true,
-        // captureBtn은 content 밖에 있으므로 ignoreElements 로직을 제거했습니다.
     }).then(canvas => {
         // 캡처 후 UI 다시 표시
         selector.classList.remove('hide');
