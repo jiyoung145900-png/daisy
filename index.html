@@ -25,6 +25,7 @@ body {
     align-items: center;
     height: 100vh;
     font-family: Arial, sans-serif;
+    position: relative; /* 캡처 버튼 배치를 위해 body에 relative를 추가 */
 }
 
 #content {
@@ -34,6 +35,8 @@ body {
     position: relative;
     color: #FFD700;
     text-shadow: 0 0 10px #000;
+    /* content 영역 자체를 중앙에 배치 */
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5); /* 시각적 구분 추가 */
 }
 
 /* 시간 */
@@ -97,17 +100,20 @@ select {
     border: 2px solid #FFD700;
 }
 
+/* 캡처 버튼 (화면 밖, 오른쪽 하단에 고정) */
 #capture-btn {
-    position: absolute;
-    bottom: 20px;
-    right: 20px;
+    position: fixed; /* 뷰포트 기준으로 고정 */
+    bottom: 40px;
+    right: 40px;
     padding: 14px 28px;
     font-size: 20px;
-    background: rgba(255,105,180, 0.6); /* 핑크색으로 변경 */
+    background: #ff69b4; /* 핫핑크 */
     color: #fff;
     border: 2px solid #FFD700;
     cursor: pointer;
     font-weight: bold;
+    z-index: 100; /* 다른 요소 위에 표시 */
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
 }
 
 .hide { display:none !important; } /* !important 추가하여 확실히 숨김 */
@@ -128,9 +134,9 @@ select {
         <select id="sido"></select>
         <select id="sigungu"></select>
     </div>
-
-    <button id="capture-btn">📸 화면 캡처</button>
 </div>
+
+<button id="capture-btn">📸 화면 캡처</button>
 
 <script>
 const regions = {
@@ -178,16 +184,15 @@ document.getElementById('capture-btn').onclick = () => {
 
     // 캡처 전에 UI 숨김
     selector.classList.add('hide');
-    captureBtn.classList.add('hide');
 
+    // #content 영역만 캡처 (버튼은 밖에 있으므로 자동으로 제외됨)
     html2canvas(content, {
         scale: 2, 
         useCORS: true,
-        // 캡처 대상에서 제외할 요소를 명시적으로 처리할 필요 없이, 이미 클래스 'hide'로 숨겼습니다.
+        // captureBtn은 content 밖에 있으므로 ignoreElements 로직을 제거했습니다.
     }).then(canvas => {
         // 캡처 후 UI 다시 표시
         selector.classList.remove('hide');
-        captureBtn.classList.remove('hide');
         
         const dataURL = canvas.toDataURL('image/png');
 
@@ -201,7 +206,6 @@ document.getElementById('capture-btn').onclick = () => {
     }).catch(err => {
         // 에러 발생 시 숨겼던 UI 다시 표시
         selector.classList.remove('hide');
-        captureBtn.classList.remove('hide');
         console.error("캡처 실패:", err);
         alert("❌ 화면 캡처에 실패했습니다. (콘솔 로그 확인)");
     });
