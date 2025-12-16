@@ -100,11 +100,16 @@ select {
     border: 2px solid #FFD700;
 }
 
-/* 캡처 버튼 (화면 밖, 오른쪽 가장자리에서 40px 간격) */
+/* 캡처 버튼 (body를 기준으로, #content의 오른쪽 1cm 옆에 배치) */
 #capture-btn {
-    position: fixed; /* 뷰포트 기준으로 고정 */
-    bottom: 40px;
-    right: 40px; /* 오른쪽 가장자리에서 40px (약 1cm) 간격 */
+    /* body가 중앙 정렬된 상태에서 #content의 오른쪽 끝 (50% + 768px)에서 40px 떨어진 곳 */
+    position: absolute; 
+    
+    /* right: 50% - (1536px / 2) - 40px -> #content의 오른쪽 바깥 40px 지점 */
+    right: calc(50% - 1536px / 2 + 40px);
+    
+    /* top: #content의 상단 (50% - 512px)에서 40px 떨어진 곳 */
+    top: calc(50% - 1024px / 2 + 40px); 
     
     padding: 14px 28px;
     font-size: 20px;
@@ -140,7 +145,7 @@ select {
 <button id="capture-btn">📸 화면 캡처</button>
 
 <script>
-// ========================= 전국 17개 광역자치단체 및 기초자치단체 데이터 (복원 및 확장) =========================
+// ========================= 전국 17개 광역자치단체 및 기초자치단체 데이터 =========================
 const regions = {
     "서울특별시": ["강남구", "강동구", "강북구", "강서구", "관악구", "광진구", "구로구", "금천구", "노원구", "도봉구", "동대문구", "동작구", "마포구", "서대문구", "서초구", "성동구", "성북구", "송파구", "양천구", "영등포구", "용산구", "은평구", "종로구", "중구", "중랑구"],
     "부산광역시": ["강서구", "금정구", "기장군", "남구", "동구", "동래구", "부산진구", "북구", "사상구", "사하구", "서구", "수영구", "연제구", "영도구", "중구", "해운대구"],
@@ -169,15 +174,14 @@ const regionDisplay = document.getElementById('region');
 sido.innerHTML = `<option value="">광역자치단체 선택</option>`;
 Object.keys(regions).forEach(r => sido.innerHTML += `<option>${r}</option>`);
 sigungu.innerHTML = `<option value="">시 / 군 / 구 선택</option>`;
-regionDisplay.textContent = "지역을 선택해 주세요"; // 초기 메시지 설정
+regionDisplay.textContent = "지역을 선택해 주세요"; 
 
-// 시도 변경 시 시군구 목록 업데이트 (오류 수정)
+// 시도 변경 시 시군구 목록 업데이트
 sido.onchange = () => {
     sigungu.innerHTML = `<option value="">시 / 군 / 구 선택</option>`;
     const selectedSigunguList = regions[sido.value];
     
     if (selectedSigunguList) {
-        // 세종시인 경우, 단일 항목만 표시 (기타 시/군/구는 선택 불필요)
         if (sido.value === "세종특별자치시") {
             sigungu.innerHTML = `<option>${selectedSigunguList[0]}</option>`;
             regionDisplay.textContent = selectedSigunguList[0];
@@ -190,12 +194,11 @@ sido.onchange = () => {
     }
 };
 
-// 시군구 변경 시 최종 지역 표시 업데이트 (오류 수정)
+// 시군구 변경 시 최종 지역 표시 업데이트
 sigungu.onchange = () => {
     if (sido.value && sigungu.value && sigungu.value !== "시 / 군 / 구 선택") {
         regionDisplay.textContent = `${sido.value} ${sigungu.value}`;
     } else if (sido.value) {
-        // 시군구를 선택하지 않았을 경우 시도만 표시 (세종시의 경우 시군구가 바로 선택됨)
         regionDisplay.textContent = sido.value; 
     }
 };
@@ -215,7 +218,7 @@ document.getElementById('capture-btn').onclick = () => {
     // 캡처 전에 UI 숨김
     selector.classList.add('hide');
 
-    // #content 영역만 캡처 (버튼은 밖에 있으므로 자동으로 제외됨)
+    // #content 영역만 캡처 
     html2canvas(content, {
         scale: 2, 
         useCORS: true,
