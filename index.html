@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>바나다 - 전국 지역 선택 화면</title>
+<title>BANADA - 전국 지역 선택 화면</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
 <style>
@@ -10,7 +10,7 @@
 :root {
     /* 🔥 문구 전체 시작점 (이게 기준점) */
     --message-left: 860px;  /* → 오른쪽 / ← 왼쪽 */
-    --message-top: 850px;   /* ↓ 아래 / ↑ 위 */
+    --message-top: 830px;   /* BANADA가 추가되어 위로 살짝(830px) 올림 */
 
     /* 시 · 군 · 구 미세 높이 조절 */
     --region-offset-y: 6px; /* ↑ ↓ */
@@ -19,14 +19,14 @@
 
 body {
     margin: 0;
-    background: #1a1a1a;
+    background: #111;
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100vh;
-    font-family: Arial, sans-serif;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
     position: relative; 
-    overflow: hidden; /* 캡처 버튼이 화면 밖으로 나갈 때 스크롤바 방지 */
+    overflow: hidden; /* 버튼이 화면 밖으로 나가도 스크롤 안 생기게 방지 */
 }
 
 #content {
@@ -36,7 +36,7 @@ body {
     position: relative;
     color: #FFD700;
     text-shadow: 0 0 10px #000;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.8); /* 좀 더 깊이감 있는 그림자 */
     flex-shrink: 0;
 }
 
@@ -44,9 +44,12 @@ body {
 #time {
     position: absolute;
     top: 20px;
-    right: 20px;
+    right: 30px;
     font-size: 80px;
     font-weight: bold;
+    color: #ffffff;
+    letter-spacing: 2px;
+    text-shadow: 0 4px 15px rgba(0, 0, 0, 0.9); /* 배경이 밝아도 잘 보이게 강한 섀도우 */
 }
 
 /* ================= 문구 블록 ================= */
@@ -54,20 +57,24 @@ body {
     position: absolute;
     left: var(--message-left);
     top: var(--message-top);
+
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    gap: 4px;
+    gap: 6px;
 }
 
-/* 바나다 브랜드 타이틀 텍스트 추가 */
-.brand-name {
-    font-size: 24px;
-    font-weight: 800;
-    color: #ff69b4; /* 캡처 버튼과 톤앤매너 통일 */
-    margin-bottom: 2px;
-    letter-spacing: 2px;
-    text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+/* 🔥 BANADA 까리한 영문 타이틀 */
+.brand-title {
+    font-size: 52px;
+    font-weight: 900;
+    font-family: 'Arial Black', sans-serif;
+    color: #ff69b4; /* 핫핑크 포인트 */
+    letter-spacing: 4px;
+    line-height: 1;
+    margin-bottom: 8px;
+    /* 네온사인 느낌의 빛나는 그림자 효과 */
+    text-shadow: 0 0 10px rgba(255, 105, 180, 0.6), 0 0 20px rgba(255, 105, 180, 0.4), 0 2px 4px #000;
 }
 
 .line {
@@ -79,66 +86,72 @@ body {
 
 /* 시 · 군 · 구 */
 #region {
-    font-size: 36px;
+    font-size: 38px;
     font-weight: 900;
     color: #fff;
     line-height: 1.1;
     position: relative;
     top: var(--region-offset-y);
+    margin: 4px 0;
 }
 /* ============================================ */
 
-/* 선택 UI */
+/* 선택 UI (세련된 반투명 블러 효과 및 디자인 개선) */
 #selector {
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    background: rgba(0,0,0,.6);
-    padding: 25px 40px;
-    border-radius: 12px;
+    background: rgba(0, 0, 0, 0.75);
+    padding: 35px 50px;
+    border-radius: 16px;
     display: flex;
     flex-direction: column;
-    align-items: center;
+    gap: 15px;
+    backdrop-filter: blur(5px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.6);
 }
 
 select {
     width: 420px;
-    padding: 10px;
+    padding: 14px 15px;
     font-size: 22px;
-    margin-bottom: 10px;
     background: #222;
     color: #FFD700;
     border: 2px solid #FFD700;
+    border-radius: 8px;
     outline: none;
     cursor: pointer;
+    font-weight: bold;
+    transition: all 0.2s;
 }
 
-select:last-child {
-    margin-bottom: 0;
+select:focus {
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
 }
 
-/* 캡처 버튼 (body 중앙 기준, content(1536px)의 오른쪽 바깥에 배치) */
+/* 캡처 버튼 (우측 바깥에 안정적으로 고정) */
 #capture-btn {
     position: absolute; 
-    /* 화면 중앙(50%)에서 컨텐츠 절반(768px)만큼 우측으로 이동 후 40px 여백 */
+    /* 화면 중앙 + 컨텐츠 절반 크기 + 40px 여백 */
     left: calc(50% + 768px + 40px);
-    top: calc(50% - 1024px / 2 + 40px); /* 상단에서 조금 내려온 위치 */
+    top: calc(50% - 1024px / 2 + 40px); 
     
-    padding: 14px 28px;
-    font-size: 20px;
+    padding: 16px 32px;
+    font-size: 22px;
     background: #ff69b4;
     color: #fff;
-    border: 2px solid #FFD700;
-    border-radius: 8px;
+    border: none;
+    border-radius: 12px;
     cursor: pointer;
-    font-weight: bold;
+    font-weight: 900;
     z-index: 100;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-    transition: transform 0.2s;
+    box-shadow: 0 6px 20px rgba(255, 105, 180, 0.4);
+    transition: transform 0.1s, background 0.2s;
 }
 
 #capture-btn:hover {
+    background: #ff47a3;
     transform: scale(1.05);
 }
 
@@ -146,9 +159,7 @@ select:last-child {
     transform: scale(0.95);
 }
 
-.hide { 
-    display: none !important; 
-}
+.hide { display:none !important; }
 </style>
 </head>
 
@@ -157,7 +168,7 @@ select:last-child {
     <div id="time"></div>
 
     <div id="message">
-        <div class="brand-name">바나다</div>
+        <div class="brand-title">BANADA</div>
         <div class="line">가까운 곳에서, 끌림이 피는 중</div>
         <div id="region">지역을 선택해 주세요</div>
         <div class="line">근처의 누군가를 찾고 있어요..</div>
@@ -172,7 +183,7 @@ select:last-child {
 <button id="capture-btn">📸 화면 캡처</button>
 
 <script>
-// ========================= 전국 자치단체 데이터 =========================
+// ========================= 전국 17개 광역자치단체 및 기초자치단체 데이터 =========================
 const regions = {
     "서울특별시": ["강남구", "강동구", "강북구", "강서구", "관악구", "광진구", "구로구", "금천구", "노원구", "도봉구", "동대문구", "동작구", "마포구", "서대문구", "서초구", "성동구", "성북구", "송파구", "양천구", "영등포구", "용산구", "은평구", "종로구", "중구", "중랑구"],
     "부산광역시": ["강서구", "금정구", "기장군", "남구", "동구", "동래구", "부산진구", "북구", "사상구", "사하구", "서구", "수영구", "연제구", "영도구", "중구", "해운대구"],
@@ -197,94 +208,85 @@ const sido = document.getElementById('sido');
 const sigungu = document.getElementById('sigungu');
 const regionDisplay = document.getElementById('region');
 
-// 1. 초기 렌더링 함수
-function initSelectBoxes() {
-    let sidoOptions = `<option value="">광역자치단체 선택</option>`;
-    Object.keys(regions).forEach(r => sidoOptions += `<option value="${r}">${r}</option>`);
-    sido.innerHTML = sidoOptions;
-    
-    sigungu.innerHTML = `<option value="">시 / 군 / 구 선택</option>`;
-    regionDisplay.textContent = "지역을 선택해 주세요"; 
-}
-initSelectBoxes();
+// 초기값 설정
+sido.innerHTML = `<option value="">광역자치단체 선택</option>`;
+Object.keys(regions).forEach(r => sido.innerHTML += `<option value="${r}">${r}</option>`);
+sigungu.innerHTML = `<option value="">시 / 군 / 구 선택</option>`;
+regionDisplay.textContent = "지역을 선택해 주세요"; 
 
-// 2. 시도 변경 이벤트
-sido.addEventListener('change', (e) => {
-    const selectedSido = e.target.value;
-    const selectedSigunguList = regions[selectedSido];
+// 최신 이벤트 리스너 방식 적용
+sido.addEventListener('change', () => {
+    sigungu.innerHTML = `<option value="">시 / 군 / 구 선택</option>`;
+    const selectedList = regions[sido.value];
     
-    let sigunguOptions = `<option value="">시 / 군 / 구 선택</option>`;
-    
-    if (selectedSigunguList) {
-        if (selectedSido === "세종특별자치시") {
-            sigunguOptions += `<option value="${selectedSigunguList[0]}">${selectedSigunguList[0]}</option>`;
-            regionDisplay.textContent = selectedSigunguList[0];
+    if (selectedList) {
+        if (sido.value === "세종특별자치시") {
+            sigungu.innerHTML += `<option value="${selectedList[0]}">${selectedList[0]}</option>`;
+            regionDisplay.textContent = selectedList[0];
         } else {
-            selectedSigunguList.forEach(sg => sigunguOptions += `<option value="${sg}">${sg}</option>`);
-            regionDisplay.textContent = selectedSido; 
+            selectedList.forEach(sg => sigungu.innerHTML += `<option value="${sg}">${sg}</option>`);
+            regionDisplay.textContent = sido.value; 
         }
     } else {
         regionDisplay.textContent = "지역을 선택해 주세요"; 
     }
-    
-    sigungu.innerHTML = sigunguOptions;
 });
 
-// 3. 시군구 변경 이벤트
-sigungu.addEventListener('change', (e) => {
-    const selectedSido = sido.value;
-    const selectedSigungu = e.target.value;
-    
-    if (selectedSido && selectedSigungu) {
-        regionDisplay.textContent = `${selectedSido} ${selectedSigungu}`;
-    } else if (selectedSido) {
-        regionDisplay.textContent = selectedSido; 
+sigungu.addEventListener('change', () => {
+    if (sido.value && sigungu.value && sigungu.value !== "") {
+        regionDisplay.textContent = `${sido.value} ${sigungu.value}`;
+    } else if (sido.value) {
+        regionDisplay.textContent = sido.value; 
     }
 });
 
-// 4. 실시간 시계 업데이트
-setInterval(() => {
+/* 🔥 핵심 수정: 페이지 열자마자 즉시 시간 찍히게 설정 (캡처 버그 해결) 🔥 */
+function updateTime() {
     const d = new Date();
     document.getElementById('time').textContent =
         `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}:${String(d.getSeconds()).padStart(2,'0')}`;
-}, 1000);
+}
+// setInterval이 1초 기다리는 동안 빈칸 방지를 위해 즉시 1회 실행!
+updateTime(); 
+setInterval(updateTime, 1000);
 
-// 5. 캡처 기능 (html2canvas)
+/* 캡처 기능 */
 document.getElementById('capture-btn').addEventListener('click', () => {
     const content = document.getElementById('content');
     const selector = document.getElementById('selector');
     
-    // 캡처 전에 셀렉트 박스 UI 숨김 처리
+    // 캡처 전에 셀렉트박스 UI 숨김
     selector.classList.add('hide');
 
+    // #content 영역만 캡처 
     html2canvas(content, {
         scale: 2, 
         useCORS: true,
-        backgroundColor: null // 투명도 유지 또는 설정된 배경색만 렌더링
+        logging: false
     }).then(canvas => {
-        // UI 원상복구
+        // 캡처 후 UI 다시 표시
         selector.classList.remove('hide');
         
         const dataURL = canvas.toDataURL('image/png');
         const newWindow = window.open();
         
+        // 새 창 처리 안정성 강화
         if (newWindow) {
             newWindow.document.write(`
                 <html>
-                <head><title>바나다 - 지역화면 캡처</title></head>
+                <head><title>BANADA - 지역화면 캡처</title></head>
                 <body style="margin:0; background:#222; display:flex; justify-content:center; align-items:center; height:100vh;">
-                    <img src="${dataURL}" alt="캡처된 이미지" style="max-width: 100%; height: auto; box-shadow: 0 0 20px rgba(0,0,0,0.5);">
+                    <img src="${dataURL}" alt="캡처된 이미지" style="max-width: 100%; height: auto; box-shadow: 0 0 20px rgba(0,0,0,0.8);">
                 </body>
                 </html>
             `);
             newWindow.document.close();
-            alert(`✅ 화면 캡처가 완료되었습니다. 새 탭에서 이미지를 확인하고 저장해주세요.`);
+            alert(`✅ 캡처가 완료되었습니다! 새 탭에서 확인하세요.`);
         } else {
-            alert(`❌ 팝업 차단이 활성화되어 있습니다. 새 탭을 열 수 없으니 팝업 차단을 해제해 주세요.`);
+            alert(`❌ 브라우저의 '팝업 차단'을 해제해야 캡처된 이미지를 볼 수 있습니다.`);
         }
     }).catch(err => {
         selector.classList.remove('hide');
-        console.error("캡처 실패:", err);
         alert("❌ 화면 캡처에 실패했습니다.");
     });
 });
